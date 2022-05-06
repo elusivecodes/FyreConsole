@@ -17,13 +17,13 @@
 **Using Composer**
 
 ```
-composer require fyre/cli
+composer require fyre/console
 ```
 
 In PHP:
 
 ```php
-use Fyre\CLI\Cli;
+use Fyre\Console\Console;
 ```
 
 
@@ -126,30 +126,30 @@ Console::write($text, $options);
 
 ### Foreground
 
-- `"*black*"`
-- `"*red*"`
-- `"*green*"`
-- `"*yellow*"`
-- `"*blue*"`
-- `"*purple*"`
-- `"*cyan*"`
-- `"*light_gray*"`
-- `"*dark_gray*"`
-- `"*light_red*"`
-- `"*light_green*"`
-- `"*light_yellow*"`
-- `"*light_blue*"`
-- `"*light_purple*"`
-- `"*light_cyan*"`
-- `"*white*"`
+- "*black*"
+- "*red*"
+- "*green*"
+- "*yellow*"
+- "*blue*"
+- "*purple*"
+- "*cyan*"
+- "*light_gray*"
+- "*dark_gray*"
+- "*light_red*"
+- "*light_green*"
+- "*light_yellow*"
+- "*light_blue*"
+- "*light_purple*"
+- "*light_cyan*"
+- "*white*"
 
 ### Background
 
-- `"*black*"`
-- `"*red*"`
-- `"*green*"`
-- `"*yellow*"`
-- `"*blue*"`
-- `"*purple*"`
-- `"*cyan*"`
-- `"*light_gray*"`
+- "*black*"
+- "*red*"
+- "*green*"
+- "*yellow*"
+- "*blue*"
+- "*purple*"
+- "*cyan*"
+- "*light_gray*"
