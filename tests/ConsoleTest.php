@@ -3,19 +3,16 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use
-    Fyre\Console\Console,
-    PHPUnit\Framework\TestCase,
-    RuntimeException,
-    Tests\Mock\StreamFilter;
+use Fyre\Console\Console;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Tests\Mock\StreamFilter;
 
-use const
-    PHP_EOL;
+use const PHP_EOL;
 
-use function
-    exec,
-    stream_filter_append,
-    stream_filter_remove;
+use function exec;
+use function stream_filter_append;
+use function stream_filter_remove;
 
 final class ConsoleTest extends TestCase
 {

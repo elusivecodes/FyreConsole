@@ -3,36 +3,33 @@ declare(strict_types=1);
 
 namespace Fyre\Console;
 
-use
-    NumberFormatter,
-    RuntimeException;
+use NumberFormatter;
+use RuntimeException;
 
-use const
-    PHP_EOL,
-    PHP_INT_MAX,
-    PREG_SPLIT_DELIM_CAPTURE,
-    STDERR,
-    STDOUT;
+use const PHP_EOL;
+use const PHP_INT_MAX;
+use const PREG_SPLIT_DELIM_CAPTURE;
+use const STDERR;
+use const STDOUT;
 
-use function
-    array_filter,
-    array_map,
-    array_unshift,
-    count,
-    exec,
-    fwrite,
-    implode,
-    mb_strlen,
-    max,
-    min,
-    preg_match,
-    preg_split,
-    readline,
-    round,
-    str_repeat,
-    stream_isatty,
-    strtr,
-    wordwrap;
+use function array_filter;
+use function array_map;
+use function array_unshift;
+use function count;
+use function exec;
+use function fwrite;
+use function implode;
+use function mb_strlen;
+use function max;
+use function min;
+use function preg_match;
+use function preg_split;
+use function readline;
+use function round;
+use function str_repeat;
+use function stream_isatty;
+use function strtr;
+use function wordwrap;
 
 /**
  * Console

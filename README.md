@@ -1,6 +1,6 @@
 # FyreConsole
 
-**FyreConsole** is a free, CLI library for *PHP*.
+**FyreConsole** is a free, open-source CLI library for *PHP*.
 
 
 ## Table Of Contents

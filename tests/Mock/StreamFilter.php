@@ -2,15 +2,12 @@
 
 namespace Tests\Mock;
 
-use
-    php_user_filter;
+use php_user_filter;
 
-use const
-    PSFS_PASS_ON;
+use const PSFS_PASS_ON;
 
-use function
-    stream_bucket_make_writeable,
-    stream_filter_register;
+use function stream_bucket_make_writeable;
+use function stream_filter_register;
 
 class StreamFilter extends php_user_filter
 {
