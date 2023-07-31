@@ -19,7 +19,6 @@ use function count;
 use function exec;
 use function fwrite;
 use function implode;
-use function mb_strlen;
 use function max;
 use function min;
 use function preg_match;
