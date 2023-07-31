@@ -261,6 +261,7 @@ abstract class Console
      * @param string $text The text.
      * @param array $options The color options.
      * @return string The colored text.
+     * @throws RuntimeException if the color is not valid.
      */
     protected static function colorize(string $text, array $options): string
     {
