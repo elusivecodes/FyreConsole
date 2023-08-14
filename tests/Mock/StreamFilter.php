@@ -34,7 +34,7 @@ class StreamFilter extends php_user_filter
         return static::$buffer;
     }
 
-    public static function register()
+    public static function register(): void
     {
         stream_filter_register('StreamFilter', static::class);
     }
