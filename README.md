@@ -206,7 +206,7 @@ $wrap = Console::wrap($text, $maxWidth);
 
 **Write**
 
-Output text to STDOUT.
+Output text to *STDOUT*.
 
 - `$text` is a string representing the text.
 - `$options` is an array containing the color options.
