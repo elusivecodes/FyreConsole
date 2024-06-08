@@ -222,25 +222,25 @@ Console::write($text, $options);
 ## Colors
 
 ```php
-Console::BLACK;
-Console::RED;
-Console::GREEN;
-Console::YELLOW;
-Console::BLUE;
-Console::PURPLE;
-Console::CYAN;
-Console::WHITE;
-Console::GRAY;
-Console::DARKGRAY;
+Console::BLACK; // 30
+Console::RED; // 31
+Console::GREEN; // 32
+Console::YELLOW; // 33
+Console::BLUE; // 34
+Console::PURPLE; // 35
+Console::CYAN; // 36
+Console::WHITE; // 37
+Console::GRAY; // 47
+Console::DARKGRAY; // 100
 ```
 
 
 ## Styles
 
 ```php
-Console::BOLD;
-Console::DIM;
-Console::ITALIC;
-Console::UNDERLINE;
-Console::FLASH;
+Console::BOLD; // 1
+Console::DIM; // 2
+Console::ITALIC; // 3
+Console::UNDERLINE; // 4
+Console::FLASH; // 5
 ```
