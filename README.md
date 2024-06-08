@@ -48,7 +48,7 @@ Output comment text.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to *null*.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to `Console::DIM`,
+    - `style` is a number indicating the text [style](#styles), and will default to `Console::DIM`.
 
 ```php
 Console::comment($text);
@@ -73,7 +73,7 @@ Output text to *STDERR*.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to `Console::RED`.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
 Console::error($text, $options);
@@ -103,7 +103,7 @@ Output info text.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to `Console::BLUE`.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
 Console::info($text, $options);
@@ -148,7 +148,7 @@ Style text for terminal output.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to *null*.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
 $style = Console::style($text, $options);
@@ -162,7 +162,7 @@ Output success text.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to `Console::GREEN`.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
 Console::success($text, $options);
@@ -187,7 +187,7 @@ Output warning text.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
 Console::warning($text, $options);
@@ -212,7 +212,7 @@ Output text to STDOUT.
 - `$options` is an array containing the color options.
     - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
     - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
 Console::write($text, $options);
