@@ -5,83 +5,116 @@ namespace Tests;
 
 use Fyre\Console\Console;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
-use Tests\Mock\StreamFilter;
 
+use const LOCK_EX;
 use const PHP_EOL;
+use const STDERR;
+use const STDIN;
+use const STDOUT;
 
 use function exec;
-use function stream_filter_append;
-use function stream_filter_remove;
+use function file_get_contents;
+use function file_put_contents;
+use function fopen;
+use function unlink;
 
 final class ConsoleTest extends TestCase
 {
 
+    protected static $in = __DIR__.'/input';
+    protected static $out = __DIR__.'/output';
+
     protected $filter;
 
-    public function testColor(): void
+    public function testComment(): void
     {
+        Console::comment('Test');
+
         $this->assertSame(
-            'Test',
-            Console::color('Test')
+            "\033[2;37mTest\033[0m".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
-    public function testColorForeground(): void
+    public function testChoice(): void
     {
+        file_put_contents(static::$in, 'a', LOCK_EX);
+
         $this->assertSame(
-            "\033[0;34mTest\033[0m",
-            Console::color('Test', [
-                'foreground' => 'blue'
-            ])
+            'a',
+            Console::choice('Select one', ['a', 'b', 'c'])
+        );
+        $this->assertSame(
+            "\033[0;33mSelect one\033[0m".PHP_EOL.
+            " (\033[2;36ma\033[0m/\033[2;36mb\033[0m/\033[2;36mc\033[0m)".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
-    public function testColorBackground(): void
+    public function testChoiceDefault(): void
     {
+        file_put_contents(static::$in, 'x', LOCK_EX);
+
         $this->assertSame(
-            "\033[44mTest\033[0m",
-            Console::color('Test', [
-                'background' => 'blue'
-            ])
+            'a',
+            Console::choice('Select one', ['a', 'b', 'c'], 'a')
+        );
+        $this->assertSame(
+            "\033[0;33mSelect one\033[0m".PHP_EOL.
+            " (\033[1;36ma\033[0m/\033[2;36mb\033[0m/\033[2;36mc\033[0m)".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
-    public function testColorUnderline(): void
+    public function testChoiceAssoc(): void
     {
+        file_put_contents(static::$in, 'b', LOCK_EX);
+
         $this->assertSame(
-            "\033[4mTest\033[0m",
-            Console::color('Test', [
-                'underline' => true
-            ])
+            'b',
+            Console::choice('Select one', ['a' => 'Test 1', 'b' => 'Test 2', 'c' => 'Test 3'], 'a')
+        );
+        $this->assertSame(
+            "\033[0;33mSelect one\033[0m".PHP_EOL.
+            "\033[0;36m  [a]  \033[0m\033[2;37mTest 1\033[0m".PHP_EOL.
+            "\033[0;36m  [b]  \033[0m\033[2;37mTest 2\033[0m".PHP_EOL.
+            "\033[0;36m  [c]  \033[0m\033[2;37mTest 3\033[0m".PHP_EOL.
+            "\033[0;33mChoice\033[0m (\033[1;36ma\033[0m/\033[2;36mb\033[0m/\033[2;36mc\033[0m)".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
-    public function testColorInvalid(): void
+    public function testConfirm(): void
     {
-        $this->expectException(RuntimeException::class);
+        file_put_contents(static::$in, 'n', LOCK_EX);
 
-        Console::color('Test', [
-            'foreground' => 'invalid'
-        ]);
-    }
-
-    public function testColorBackgroundInvalid(): void
-    {
-        $this->expectException(RuntimeException::class);
-
-        Console::color('Test', [
-            'background' => 'invalid'
-        ]);
-    }
-
-    public function testColorMerges(): void
-    {
+        $this->assertFalse(Console::confirm('OK?'));
         $this->assertSame(
-            "\033[0;34mTest\033[0m\033[0;31mTest\033[0m\033[0;34mTest\033[0m",
-            Console::color("\033[0;34mTest\033[0mTest\033[0;34mTest\033[0m", [
-                'foreground' => 'red'
-            ])
+            "\033[0;33mOK?\033[0m".PHP_EOL.
+            " (\033[1;36my\033[0m/\033[2;36mn\033[0m)".PHP_EOL,
+            file_get_contents(static::$out)
+        );
+    }
+
+    public function testConfirmDefault(): void
+    {
+        file_put_contents(static::$in, 'x', LOCK_EX);
+
+        $this->assertTrue(Console::confirm('OK?'));
+        $this->assertSame(
+            "\033[0;33mOK?\033[0m".PHP_EOL.
+            " (\033[1;36my\033[0m/\033[2;36mn\033[0m)".PHP_EOL,
+            file_get_contents(static::$out)
+        );
+    }
+
+    public function testError(): void
+    {
+        Console::error('Test');
+
+        $this->assertSame(
+            "\033[0;31mTest\033[0m".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
@@ -101,13 +134,33 @@ final class ConsoleTest extends TestCase
         );
     }
 
+    public function testInfo(): void
+    {
+        Console::info('Test');
+
+        $this->assertSame(
+            "\033[0;34mTest\033[0m".PHP_EOL,
+            file_get_contents(static::$out)
+        );
+    }
+
+    public function testInput(): void
+    {
+        file_put_contents(static::$in, 'This is some test input', LOCK_EX);
+
+        $this->assertSame(
+            'This is some test input',
+            Console::input()
+        );
+    }
+
     public function testProgress(): void
     {
         Console::progress(5);
 
         $this->assertSame(
-            "[\033[1;32m#####.....\033[0m] 50%".PHP_EOL,
-            StreamFilter::getBuffer()
+            "[\033[0;32m#####.....\033[0m] 50%".PHP_EOL,
+            file_get_contents(static::$out)
         );
 
         Console::progress();
@@ -118,8 +171,8 @@ final class ConsoleTest extends TestCase
         Console::progress(25, 100);
 
         $this->assertSame(
-            "[\033[1;32m###.......\033[0m] 25%".PHP_EOL,
-            StreamFilter::getBuffer()
+            "[\033[0;32m###.......\033[0m] 25%".PHP_EOL,
+            file_get_contents(static::$out)
         );
 
         Console::progress();
@@ -131,8 +184,110 @@ final class ConsoleTest extends TestCase
         Console::progress();
 
         $this->assertSame(
-            "[\033[1;32m#####.....\033[0m] 50%".PHP_EOL."\033[1A\033[K\007",
-            StreamFilter::getBuffer()
+            "[\033[0;32m#####.....\033[0m] 50%".PHP_EOL."\033[1A\033[K\007",
+            file_get_contents(static::$out)
+        );
+    }
+
+    public function testPrompt(): void
+    {
+        file_put_contents(static::$in, 'This is some test input', LOCK_EX);
+
+        $this->assertSame(
+            'This is some test input',
+            Console::prompt('This is a prompt')
+        );
+        $this->assertSame(
+            "\033[0;33mThis is a prompt\033[0m".PHP_EOL,
+            file_get_contents(static::$out)
+        );
+    }
+
+    public function testStyle(): void
+    {
+        $this->assertSame(
+            'Test',
+            Console::style('Test')
+        );
+    }
+
+    public function testStyleColor(): void
+    {
+        $this->assertSame(
+            "\033[0;34mTest\033[0m",
+            Console::style('Test', [
+                'color' => Console::BLUE
+            ])
+        );
+    }
+
+    public function testStyleBackground(): void
+    {
+        $this->assertSame(
+            "\033[0;37;44mTest\033[0m",
+            Console::style('Test', [
+                'bg' => Console::BLUE
+            ])
+        );
+    }
+
+    public function testStyleBold(): void
+    {
+        $this->assertSame(
+            "\033[1;37mTest\033[0m",
+            Console::style('Test', [
+                'style' => Console::BOLD
+            ])
+        );
+    }
+
+    public function testStyleDim(): void
+    {
+        $this->assertSame(
+            "\033[2;37mTest\033[0m",
+            Console::style('Test', [
+                'style' => Console::DIM
+            ])
+        );
+    }
+
+    public function testStyleItalic(): void
+    {
+        $this->assertSame(
+            "\033[3;37mTest\033[0m",
+            Console::style('Test', [
+                'style' => Console::ITALIC
+            ])
+        );
+    }
+
+    public function testStyleUnderline(): void
+    {
+        $this->assertSame(
+            "\033[4;37mTest\033[0m",
+            Console::style('Test', [
+                'style' => Console::UNDERLINE
+            ])
+        );
+    }
+
+    public function testStyleFlash(): void
+    {
+        $this->assertSame(
+            "\033[5;37mTest\033[0m",
+            Console::style('Test', [
+                'style' => Console::FLASH
+            ])
+        );
+    }
+
+    public function testSuccess(): void
+    {
+        Console::success('Test');
+
+        $this->assertSame(
+            "\033[0;32mTest\033[0m".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
@@ -148,7 +303,7 @@ final class ConsoleTest extends TestCase
             '| 1    | 2     | 3 |'.PHP_EOL.
             '| Test | Value | 0 |'.PHP_EOL.
             '+------+-------+---+'.PHP_EOL,
-            StreamFilter::getBuffer()
+            file_get_contents(static::$out)
         );
     }
 
@@ -170,7 +325,7 @@ final class ConsoleTest extends TestCase
             '| 1    | 2     | 3 |'.PHP_EOL.
             '| Test | Value | 0 |'.PHP_EOL.
             '+------+-------+---+'.PHP_EOL,
-            StreamFilter::getBuffer()
+            file_get_contents(static::$out)
         );
     }
 
@@ -178,7 +333,7 @@ final class ConsoleTest extends TestCase
     {
         Console::table([
             ['1', '2', '3'],
-            [Console::color('Test', ['foreground' => 'blue']), 'Value', '0']
+            [Console::style('Test', ['color' => Console::BLUE]), 'Value', '0']
         ]);
 
         $this->assertSame(
@@ -186,17 +341,17 @@ final class ConsoleTest extends TestCase
             '| 1    | 2     | 3 |'.PHP_EOL.
             "| \033[0;34mTest\033[0m | Value | 0 |".PHP_EOL.
             '+------+-------+---+'.PHP_EOL,
-            StreamFilter::getBuffer()
+            file_get_contents(static::$out)
         );
     }
 
-    public function testWrite(): void
+    public function testWarning(): void
     {
-        Console::write('Test');
+        Console::warning('Test');
 
         $this->assertSame(
-            'Test'.PHP_EOL,
-            StreamFilter::getBuffer()
+            "\033[0;33mTest\033[0m".PHP_EOL,
+            file_get_contents(static::$out)
         );
     }
 
@@ -211,21 +366,35 @@ final class ConsoleTest extends TestCase
         );
     }
 
+    public function testWrite(): void
+    {
+        Console::write('Test');
+
+        $this->assertSame(
+            'Test'.PHP_EOL,
+            file_get_contents(static::$out)
+        );
+    }
+
     protected function setUp(): void
     {
-        $this->filter = stream_filter_append(STDOUT, 'StreamFilter');
+        file_put_contents(static::$in, '', LOCK_EX);
+        file_put_contents(static::$out, '', LOCK_EX);
+
+        $input = fopen(static::$in, 'r');
+        $output = fopen(static::$out, 'w');
+
+        Console::setInput($input);
+        Console::setOutput($output);
     }
 
     protected function tearDown(): void
     {
-        StreamFilter::clear();
+        @unlink(static::$in);
+        @unlink(static::$out);
 
-        stream_filter_remove($this->filter);
-    }
-
-    public static function setUpBeforeClass(): void
-    {
-        StreamFilter::register();
+        Console::setInput(STDIN);
+        Console::setOutput(STDOUT, STDERR);
     }
 
 }

@@ -7,8 +7,7 @@
 - [Installation](#installation)
 - [Methods](#methods)
 - [Colors](#colors)
-    - [Foreground](#foreground)
-    - [Background](#background)
+- [Styles](#styles)
 
 
 
@@ -29,18 +28,41 @@ use Fyre\Console\Console;
 
 ## Methods
 
-**Color**
+**Choice**
 
-Color a string for terminal output, preserving existing colors.
+Prompt to make a choice out of available options.
+
+- `$text` is a string representing the prompt text.
+- `$options` is an array containing the options.
+- `$default` is a string representing the default option, and will default to *null*.
+
+```php
+$choice = Console::choice($text, $options, $default);
+```
+
+**Comment**
+
+Output comment text.
 
 - `$text` is a string representing the text.
 - `$options` is an array containing the color options.
-    - `foreground` is a string representing the [foreground color](#foreground).
-    - `background` is a string representing the [background color](#background).
-    - `underline` is a boolean indicating whether to underline the text, and will default to *false*.
+    - `color` is a number representing the text [color](#colors), and will default to *null*.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to `Console::DIM`,
 
 ```php
-Console::color($text, $options);
+Console::comment($text);
+```
+
+**Confirm**
+
+Prompt to confirm with y/n options.
+
+- `$text` is a string representing the prompt text.
+- `$default` is a boolean representing the default option, and will default to *true*.
+
+```php
+$confirm = Console::confirm($text, $default);
 ```
 
 **Error**
@@ -49,9 +71,9 @@ Output text to *STDERR*.
 
 - `$text` is a string representing the text.
 - `$options` is an array containing the color options.
-    - `foreground` is a string representing the [foreground color](#foreground), and will default to "*light_red*".
-    - `background` is a string representing the [background color](#background).
-    - `underline` is a boolean indicating whether to underline the text, and will default to *false*.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::RED`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*,
 
 ```php
 Console::error($text, $options);
@@ -73,14 +95,26 @@ Get the terminal width (in characters).
 $width = Console::getWidth();
 ```
 
+**Info**
+
+Output info text.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::BLUE`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+
+```php
+Console::info($text, $options);
+```
+
 **Input**
 
 Read a line of input.
 
-- `$prefix` is a string representing the prefix, and will default to "".
-
 ```php
-$input = Console::input($prefix);
+$input = Console::input();
 ```
 
 **Progress**
@@ -96,6 +130,44 @@ Console::progress($step, $totalSteps);
 
 Sequential calls to this method will update the progress indicator. If the `$step` is set to *null* the indicator will be cleared.
 
+**Prompt**
+
+Prompt the user for input.
+
+- `$text` is a string representing the prompt text.
+
+```php
+$prompt = Console::prompt($text);
+```
+
+**Style**
+
+Style text for terminal output.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to *null*.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+
+```php
+$style = Console::style($text, $options);
+```
+
+**Success**
+
+Output success text.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::GREEN`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+
+```php
+Console::success($text, $options);
+```
+
 **Table**
 
 Output a table.
@@ -107,15 +179,40 @@ Output a table.
 Console::table($data, $header);
 ```
 
+**Warning**
+
+Output warning text.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*,
+
+```php
+Console::warning($text, $options);
+```
+
+**Wrap**
+
+Wrap text for terminal output.
+
+- `$text` is a string representing the text.
+- `$maxWidth` is a number representing the maximum character width of a line, and will default to the terminal width.
+
+```php
+$wrap = Console::wrap($text, $maxWidth);
+```
+
 **Write**
 
 Output text to STDOUT.
 
 - `$text` is a string representing the text.
 - `$options` is an array containing the color options.
-    - `foreground` is a string representing the [foreground color](#foreground).
-    - `background` is a string representing the [background color](#background).
-    - `underline` is a boolean indicating whether to underline the text, and will default to *false*.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*,
 
 ```php
 Console::write($text, $options);
@@ -124,32 +221,26 @@ Console::write($text, $options);
 
 ## Colors
 
-### Foreground
+```php
+Console::BLACK;
+Console::RED;
+Console::GREEN;
+Console::YELLOW;
+Console::BLUE;
+Console::PURPLE;
+Console::CYAN;
+Console::WHITE;
+Console::GRAY;
+Console::DARKGRAY;
+```
 
-- "*black*"
-- "*red*"
-- "*green*"
-- "*yellow*"
-- "*blue*"
-- "*purple*"
-- "*cyan*"
-- "*light_gray*"
-- "*dark_gray*"
-- "*light_red*"
-- "*light_green*"
-- "*light_yellow*"
-- "*light_blue*"
-- "*light_purple*"
-- "*light_cyan*"
-- "*white*"
 
-### Background
+## Styles
 
-- "*black*"
-- "*red*"
-- "*green*"
-- "*yellow*"
-- "*blue*"
-- "*purple*"
-- "*cyan*"
-- "*light_gray*"
+```php
+Console::BOLD;
+Console::DIM;
+Console::ITALIC;
+Console::UNDERLINE;
+Console::FLASH;
+```
