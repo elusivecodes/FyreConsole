@@ -5,11 +5,6 @@ namespace Fyre\Console;
 
 use NumberFormatter;
 
-use const PHP_EOL;
-use const PHP_INT_MAX;
-use const STDERR;
-use const STDOUT;
-
 use function array_is_list;
 use function array_keys;
 use function array_unshift;
@@ -22,46 +17,67 @@ use function max;
 use function min;
 use function preg_replace;
 use function round;
-use function strcasecmp;
+use function rtrim;
 use function str_pad;
 use function str_repeat;
+use function strcasecmp;
 use function wordwrap;
+
+use const PHP_EOL;
+use const PHP_INT_MAX;
+use const STDERR;
+use const STDOUT;
 
 /**
  * Console
  */
 abstract class Console
 {
-
     public const BLACK = 30;
-    public const RED = 31;
-    public const GREEN = 32;
-    public const YELLOW = 33;
+
     public const BLUE = 34;
-    public const PURPLE = 35;
-    public const CYAN = 36;
-    public const WHITE = 37;
-    public const GRAY = 47;
-    public const DARKGRAY = 100;
 
     public const BOLD = 1;
+
+    public const CYAN = 36;
+
+    public const DARKGRAY = 100;
+
     public const DIM = 2;
-    public const ITALIC = 3;
-    public const UNDERLINE = 4;
+
     public const FLASH = 5;
 
-    protected static $input = STDIN;
-    protected static $output = STDOUT;
-    protected static $error = STDERR;
+    public const GRAY = 47;
+
+    public const GREEN = 32;
+
+    public const ITALIC = 3;
+
+    public const PURPLE = 35;
+
+    public const RED = 31;
+
+    public const UNDERLINE = 4;
+
+    public const WHITE = 37;
+
+    public const YELLOW = 33;
 
     protected const TOTAL_STEPS = 10;
 
+    protected static $error = STDERR;
+
+    protected static $input = STDIN;
+
     protected static int|null $lastStep = null;
+
+    protected static $output = STDOUT;
 
     protected static NumberFormatter $percentFormatter;
 
     /**
      * Prompt to make a choice out of available options.
+     *
      * @param string $text The prompt text.
      * @param array $options The options.
      * @param string|null $default The default option.
@@ -76,11 +92,11 @@ abstract class Console
             $optionKeys = array_keys($options);
 
             $maxLength = 0;
-            foreach ($optionKeys AS $option) {
+            foreach ($optionKeys as $option) {
                 $maxLength = max($maxLength, strlen($option));
             }
 
-            foreach ($options AS $option => $description) {
+            foreach ($options as $option => $description) {
                 $key = str_pad('  ['.$option.']', $maxLength + 6);
                 $key = static::style($key, ['color' => static::CYAN]);
                 $value = static::style($description, ['style' => static::DIM]);
@@ -94,7 +110,7 @@ abstract class Console
         }
 
         $optionList = [];
-        foreach ($optionKeys AS $option) {
+        foreach ($optionKeys as $option) {
             $optionStyles = ['color' => static::CYAN];
 
             if ($option === $default) {
@@ -110,7 +126,7 @@ abstract class Console
 
         $choice = static::input() ?: $default;
 
-        foreach ($optionKeys AS $option) {
+        foreach ($optionKeys as $option) {
             if (strcasecmp($option, $choice) === 0) {
                 return $option;
             }
@@ -121,6 +137,7 @@ abstract class Console
 
     /**
      * Output comment text.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      */
@@ -133,6 +150,7 @@ abstract class Console
 
     /**
      * Prompt the user to confirm (y/n).
+     *
      * @param string $text The prompt text.
      * @param bool $default The default option.
      * @return bool TRUE if the user confirmed the prompt, otherwise FALSE.
@@ -146,6 +164,7 @@ abstract class Console
 
     /**
      * Output text to STDERR.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      */
@@ -160,6 +179,7 @@ abstract class Console
 
     /**
      * Get the terminal height (in characters).
+     *
      * @return int The terminal height.
      */
     public static function getHeight(): int
@@ -169,6 +189,7 @@ abstract class Console
 
     /**
      * Get the terminal width (in characters).
+     *
      * @return int The terminal width.
      */
     public static function getWidth(): int
@@ -178,6 +199,7 @@ abstract class Console
 
     /**
      * Output info text.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      */
@@ -190,15 +212,17 @@ abstract class Console
 
     /**
      * Read a line of input.
+     *
      * @return string The input text.
      */
     public static function input(): string
     {
-        return fgets(static::$input);
+        return rtrim(fgets(static::$input), "\r\n");
     }
 
     /**
      * Output a progress indicator.
+     *
      * @param int|null $step The step.
      * @param int $totalSteps The total steps.
      */
@@ -206,9 +230,10 @@ abstract class Console
     {
         if ($step === null) {
             static::$lastStep = $step;
-    
+
             fwrite(static::$output, "\033[1A\033[K");
             fwrite(static::$output, "\007");
+
             return;
         }
 
@@ -234,6 +259,7 @@ abstract class Console
 
     /**
      * Prompt the user for input.
+     *
      * @param string $text The prompt text.
      * @return string The input text.
      */
@@ -246,6 +272,7 @@ abstract class Console
 
     /**
      * Set the input stream.
+     *
      * @param mixed $input The input stream.
      */
     public static function setInput(mixed $input): void
@@ -255,6 +282,7 @@ abstract class Console
 
     /**
      * Set the output stream.
+     *
      * @param mixed $output The output stream.
      * @param mixed $error The error stream.
      */
@@ -266,6 +294,7 @@ abstract class Console
 
     /**
      * Style a string for terminal output.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      * @return string The styled text.
@@ -299,6 +328,7 @@ abstract class Console
 
     /**
      * Output success text.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      */
@@ -311,6 +341,7 @@ abstract class Console
 
     /**
      * Output a table.
+     *
      * @param array $data The table rows.
      * @param array $header The table header columns.
      */
@@ -322,21 +353,21 @@ abstract class Console
 
         $maxLengths = [];
 
-        foreach ($data AS $row) {
-            foreach ($row AS $i => $value) {
+        foreach ($data as $row) {
+            foreach ($row as $i => $value) {
                 $maxLengths[$i] ??= 0;
                 $maxLengths[$i] = max($maxLengths[$i], static::strlen((string) $value));
             }
         }
 
         $border = '+';
-        foreach ($maxLengths AS $length) {
+        foreach ($maxLengths as $length) {
             $border .= str_repeat('-', $length + 2).'+';
         }
         $border .= PHP_EOL;
 
-        foreach ($data AS $i => $row) {
-            foreach ($row AS $j => $value) {
+        foreach ($data as $i => $row) {
+            foreach ($row as $j => $value) {
                 $diff = $maxLengths[$j] - static::strlen((string) $value);
                 $data[$i][$j] .= str_repeat(' ', $diff);
             }
@@ -346,7 +377,7 @@ abstract class Console
 
         $table = '';
 
-        foreach ($data AS $i => $row) {
+        foreach ($data as $i => $row) {
             if ($i === 0) {
                 $table .= $border;
             }
@@ -363,6 +394,7 @@ abstract class Console
 
     /**
      * Output warning text.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      */
@@ -375,6 +407,7 @@ abstract class Console
 
     /**
      * Wrap text for terminal output.
+     *
      * @param string $text The text.
      * @param int|null $maxWidth The maximum width.
      */
@@ -387,6 +420,7 @@ abstract class Console
 
     /**
      * Output text to STDOUT.
+     *
      * @param string $text The text.
      * @param array $options The style options.
      */
@@ -399,6 +433,7 @@ abstract class Console
 
     /**
      * Create a percent formatter.
+     *
      * @return NumberFormatter The percent formatter.
      */
     protected static function percentFormatter(): NumberFormatter
@@ -408,6 +443,7 @@ abstract class Console
 
     /**
      * Get the real length of a string.
+     *
      * @param string $string The string.
      * @return int The length.
      */
@@ -417,5 +453,4 @@ abstract class Console
 
         return mb_strwidth($string);
     }
-
 }
