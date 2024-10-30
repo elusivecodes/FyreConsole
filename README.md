@@ -5,7 +5,9 @@
 
 ## Table Of Contents
 - [Installation](#installation)
+- [Basic Usage](#basic-usage)
 - [Methods](#methods)
+- [Static Methods](#static-methods)
 - [Colors](#colors)
 - [Styles](#styles)
 
@@ -26,6 +28,17 @@ use Fyre\Console\Console;
 ```
 
 
+## Basic Usage
+
+- `$input` is the input stream, and will default to `STDIN`.
+- `$output` is the output stream, and will default to `STDOUT`.
+- `$error` is the error stream, and will default to `STDERR`.
+
+```php
+$io = new Console($input, $output, $error);
+```
+
+
 ## Methods
 
 **Choice**
@@ -37,7 +50,7 @@ Prompt to make a choice out of available options.
 - `$default` is a string representing the default option, and will default to *null*.
 
 ```php
-$choice = Console::choice($text, $options, $default);
+$choice = $io->choice($text, $options, $default);
 ```
 
 **Comment**
@@ -51,7 +64,7 @@ Output comment text.
     - `style` is a number indicating the text [style](#styles), and will default to `Console::DIM`.
 
 ```php
-Console::comment($text);
+$io->comment($text);
 ```
 
 **Confirm**
@@ -62,7 +75,7 @@ Prompt to confirm with y/n options.
 - `$default` is a boolean representing the default option, and will default to *true*.
 
 ```php
-$confirm = Console::confirm($text, $default);
+$confirm = $io->confirm($text, $default);
 ```
 
 **Error**
@@ -76,8 +89,120 @@ Output text to *STDERR*.
     - `style` is a number indicating the text [style](#styles), and will default to *null*.
 
 ```php
-Console::error($text, $options);
+$io->error($text, $options);
 ```
+
+**Info**
+
+Output info text.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::BLUE`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
+
+```php
+$io->info($text, $options);
+```
+
+**Input**
+
+Read a line of input.
+
+```php
+$input = $io->input();
+```
+
+**Progress**
+
+Output a progress indicator.
+
+- `$step` is a number representing the current step, and will default to *null*.
+- `$totalSteps` is a number representing the total steps, and will default to *10*.
+
+```php
+$io->progress($step, $totalSteps);
+```
+
+Sequential calls to this method will update the progress indicator. If the `$step` is set to *null* the indicator will be cleared.
+
+**Prompt**
+
+Prompt the user for input.
+
+- `$text` is a string representing the prompt text.
+
+```php
+$prompt = $io->prompt($text);
+```
+
+**Success**
+
+Output success text.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::GREEN`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
+
+```php
+$io->success($text, $options);
+```
+
+**Table**
+
+Output a table.
+
+- `$data` is an array containing the table rows.
+- `$header` is an array containing the table header columns, and will default to *[]*.
+
+```php
+$io->table($data, $header);
+```
+
+**Warning**
+
+Output warning text.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
+
+```php
+$io->warning($text, $options);
+```
+
+**Wrap**
+
+Wrap text for terminal output.
+
+- `$text` is a string representing the text.
+- `$maxWidth` is a number representing the maximum character width of a line, and will default to the terminal width.
+
+```php
+$wrap = $io->wrap($text, $maxWidth);
+```
+
+**Write**
+
+Output text to *STDOUT*.
+
+- `$text` is a string representing the text.
+- `$options` is an array containing the color options.
+    - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
+    - `bg` is a number representing the background [color](#colors), and will default to *null*.
+    - `style` is a number indicating the text [style](#styles), and will default to *null*.
+
+```php
+$io->write($text, $options);
+```
+
+
+## Static Methods
 
 **Get Height**
 
@@ -95,51 +220,6 @@ Get the terminal width (in characters).
 $width = Console::getWidth();
 ```
 
-**Info**
-
-Output info text.
-
-- `$text` is a string representing the text.
-- `$options` is an array containing the color options.
-    - `color` is a number representing the text [color](#colors), and will default to `Console::BLUE`.
-    - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*.
-
-```php
-Console::info($text, $options);
-```
-
-**Input**
-
-Read a line of input.
-
-```php
-$input = Console::input();
-```
-
-**Progress**
-
-Output a progress indicator.
-
-- `$step` is a number representing the current step, and will default to *null*.
-- `$totalSteps` is a number representing the total steps, and will default to *10*.
-
-```php
-Console::progress($step, $totalSteps);
-```
-
-Sequential calls to this method will update the progress indicator. If the `$step` is set to *null* the indicator will be cleared.
-
-**Prompt**
-
-Prompt the user for input.
-
-- `$text` is a string representing the prompt text.
-
-```php
-$prompt = Console::prompt($text);
-```
-
 **Style**
 
 Style text for terminal output.
@@ -152,70 +232,6 @@ Style text for terminal output.
 
 ```php
 $style = Console::style($text, $options);
-```
-
-**Success**
-
-Output success text.
-
-- `$text` is a string representing the text.
-- `$options` is an array containing the color options.
-    - `color` is a number representing the text [color](#colors), and will default to `Console::GREEN`.
-    - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*.
-
-```php
-Console::success($text, $options);
-```
-
-**Table**
-
-Output a table.
-
-- `$data` is an array containing the table rows.
-- `$header` is an array containing the table header columns, and will default to *[]*.
-
-```php
-Console::table($data, $header);
-```
-
-**Warning**
-
-Output warning text.
-
-- `$text` is a string representing the text.
-- `$options` is an array containing the color options.
-    - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
-    - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*.
-
-```php
-Console::warning($text, $options);
-```
-
-**Wrap**
-
-Wrap text for terminal output.
-
-- `$text` is a string representing the text.
-- `$maxWidth` is a number representing the maximum character width of a line, and will default to the terminal width.
-
-```php
-$wrap = Console::wrap($text, $maxWidth);
-```
-
-**Write**
-
-Output text to *STDOUT*.
-
-- `$text` is a string representing the text.
-- `$options` is an array containing the color options.
-    - `color` is a number representing the text [color](#colors), and will default to `Console::YELLOW`.
-    - `bg` is a number representing the background [color](#colors), and will default to *null*.
-    - `style` is a number indicating the text [style](#styles), and will default to *null*.
-
-```php
-Console::write($text, $options);
 ```
 
 

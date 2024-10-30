@@ -14,9 +14,6 @@ use function unlink;
 
 use const LOCK_EX;
 use const PHP_EOL;
-use const STDERR;
-use const STDIN;
-use const STDOUT;
 
 final class ConsoleTest extends TestCase
 {
@@ -24,7 +21,7 @@ final class ConsoleTest extends TestCase
 
     protected static $out = __DIR__.'/output';
 
-    protected $filter;
+    protected Console $console;
 
     public function testChoice(): void
     {
@@ -32,7 +29,7 @@ final class ConsoleTest extends TestCase
 
         $this->assertSame(
             'a',
-            Console::choice('Select one', ['a', 'b', 'c'])
+            $this->console->choice('Select one', ['a', 'b', 'c'])
         );
         $this->assertSame(
             "\033[0;33mSelect one\033[0m".PHP_EOL.
@@ -47,7 +44,7 @@ final class ConsoleTest extends TestCase
 
         $this->assertSame(
             'b',
-            Console::choice('Select one', ['a' => 'Test 1', 'b' => 'Test 2', 'c' => 'Test 3'], 'a')
+            $this->console->choice('Select one', ['a' => 'Test 1', 'b' => 'Test 2', 'c' => 'Test 3'], 'a')
         );
         $this->assertSame(
             "\033[0;33mSelect one\033[0m".PHP_EOL.
@@ -65,7 +62,7 @@ final class ConsoleTest extends TestCase
 
         $this->assertSame(
             'a',
-            Console::choice('Select one', ['a', 'b', 'c'], 'a')
+            $this->console->choice('Select one', ['a', 'b', 'c'], 'a')
         );
         $this->assertSame(
             "\033[0;33mSelect one\033[0m".PHP_EOL.
@@ -76,7 +73,7 @@ final class ConsoleTest extends TestCase
 
     public function testComment(): void
     {
-        Console::comment('Test');
+        $this->console->comment('Test');
 
         $this->assertSame(
             "\033[2;37mTest\033[0m".PHP_EOL,
@@ -88,7 +85,7 @@ final class ConsoleTest extends TestCase
     {
         file_put_contents(self::$in, 'n'."\r\n", LOCK_EX);
 
-        $this->assertFalse(Console::confirm('OK?'));
+        $this->assertFalse($this->console->confirm('OK?'));
         $this->assertSame(
             "\033[0;33mOK?\033[0m".PHP_EOL.
             " (\033[1;36my\033[0m/\033[2;36mn\033[0m)".PHP_EOL,
@@ -100,7 +97,7 @@ final class ConsoleTest extends TestCase
     {
         file_put_contents(self::$in, 'x'."\r\n", LOCK_EX);
 
-        $this->assertTrue(Console::confirm('OK?'));
+        $this->assertTrue($this->console->confirm('OK?'));
         $this->assertSame(
             "\033[0;33mOK?\033[0m".PHP_EOL.
             " (\033[1;36my\033[0m/\033[2;36mn\033[0m)".PHP_EOL,
@@ -110,7 +107,7 @@ final class ConsoleTest extends TestCase
 
     public function testError(): void
     {
-        Console::error('Test');
+        $this->console->error('Test');
 
         $this->assertSame(
             "\033[0;31mTest\033[0m".PHP_EOL,
@@ -136,7 +133,7 @@ final class ConsoleTest extends TestCase
 
     public function testInfo(): void
     {
-        Console::info('Test');
+        $this->console->info('Test');
 
         $this->assertSame(
             "\033[0;34mTest\033[0m".PHP_EOL,
@@ -150,26 +147,26 @@ final class ConsoleTest extends TestCase
 
         $this->assertSame(
             'This is some test input',
-            Console::input()
+            $this->console->input()
         );
     }
 
     public function testProgress(): void
     {
-        Console::progress(5);
+        $this->console->progress(5);
 
         $this->assertSame(
             "[\033[0;32m#####.....\033[0m] 50%".PHP_EOL,
             file_get_contents(self::$out)
         );
 
-        Console::progress();
+        $this->console->progress();
     }
 
     public function testProgressClear(): void
     {
-        Console::progress(5);
-        Console::progress();
+        $this->console->progress(5);
+        $this->console->progress();
 
         $this->assertSame(
             "[\033[0;32m#####.....\033[0m] 50%".PHP_EOL."\033[1A\033[K\007",
@@ -179,14 +176,14 @@ final class ConsoleTest extends TestCase
 
     public function testProgressTotalSteps(): void
     {
-        Console::progress(25, 100);
+        $this->console->progress(25, 100);
 
         $this->assertSame(
             "[\033[0;32m###.......\033[0m] 25%".PHP_EOL,
             file_get_contents(self::$out)
         );
 
-        Console::progress();
+        $this->console->progress();
     }
 
     public function testPrompt(): void
@@ -195,7 +192,7 @@ final class ConsoleTest extends TestCase
 
         $this->assertSame(
             'This is some test input',
-            Console::prompt('This is a prompt')
+            $this->console->prompt('This is a prompt')
         );
         $this->assertSame(
             "\033[0;33mThis is a prompt\033[0m".PHP_EOL,
@@ -283,7 +280,7 @@ final class ConsoleTest extends TestCase
 
     public function testSuccess(): void
     {
-        Console::success('Test');
+        $this->console->success('Test');
 
         $this->assertSame(
             "\033[0;32mTest\033[0m".PHP_EOL,
@@ -293,7 +290,7 @@ final class ConsoleTest extends TestCase
 
     public function testTable(): void
     {
-        Console::table([
+        $this->console->table([
             ['1', '2', '3'],
             ['Test', 'Value', '0'],
         ]);
@@ -309,7 +306,7 @@ final class ConsoleTest extends TestCase
 
     public function testTableColor(): void
     {
-        Console::table([
+        $this->console->table([
             ['1', '2', '3'],
             [Console::style('Test', ['color' => Console::BLUE]), 'Value', '0'],
         ]);
@@ -325,7 +322,7 @@ final class ConsoleTest extends TestCase
 
     public function testTableHeader(): void
     {
-        Console::table([
+        $this->console->table([
             ['1', '2', '3'],
             ['Test', 'Value', '0'],
         ], [
@@ -347,7 +344,7 @@ final class ConsoleTest extends TestCase
 
     public function testWarning(): void
     {
-        Console::warning('Test');
+        $this->console->warning('Test');
 
         $this->assertSame(
             "\033[0;33mTest\033[0m".PHP_EOL,
@@ -362,13 +359,13 @@ final class ConsoleTest extends TestCase
             'is a'.PHP_EOL.
             'test'.PHP_EOL.
             'string',
-            Console::wrap('This is a test string', 5)
+            $this->console->wrap('This is a test string', 5)
         );
     }
 
     public function testWrite(): void
     {
-        Console::write('Test');
+        $this->console->write('Test');
 
         $this->assertSame(
             'Test'.PHP_EOL,
@@ -384,16 +381,12 @@ final class ConsoleTest extends TestCase
         $input = fopen(self::$in, 'r');
         $output = fopen(self::$out, 'w');
 
-        Console::setInput($input);
-        Console::setOutput($output);
+        $this->console = new Console($input, $output, $output);
     }
 
     protected function tearDown(): void
     {
         @unlink(self::$in);
         @unlink(self::$out);
-
-        Console::setInput(STDIN);
-        Console::setOutput(STDOUT, STDERR);
     }
 }

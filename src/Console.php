@@ -31,7 +31,7 @@ use const STDOUT;
 /**
  * Console
  */
-abstract class Console
+class Console
 {
     public const BLACK = 30;
 
@@ -65,117 +65,15 @@ abstract class Console
 
     protected const TOTAL_STEPS = 10;
 
-    protected static $error = STDERR;
-
-    protected static $input = STDIN;
-
-    protected static int|null $lastStep = null;
-
-    protected static $output = STDOUT;
-
     protected static NumberFormatter $percentFormatter;
 
-    /**
-     * Prompt to make a choice out of available options.
-     *
-     * @param string $text The prompt text.
-     * @param array $options The options.
-     * @param string|null $default The default option.
-     * @return string|null The selected option.
-     */
-    public static function choice(string $text, array $options, string|null $default = null): string|null
-    {
-        static::write($text, ['color' => static::YELLOW]);
+    protected $error;
 
-        $prefix = '';
-        if (!array_is_list($options)) {
-            $optionKeys = array_keys($options);
+    protected $input;
 
-            $maxLength = 0;
-            foreach ($optionKeys as $option) {
-                $maxLength = max($maxLength, strlen($option));
-            }
+    protected int|null $lastStep = null;
 
-            foreach ($options as $option => $description) {
-                $key = str_pad('  ['.$option.']', $maxLength + 6);
-                $key = static::style($key, ['color' => static::CYAN]);
-                $value = static::style($description, ['style' => static::DIM]);
-
-                static::write($key.$value);
-            }
-
-            $prefix = static::style('Choice', ['color' => static::YELLOW]);
-        } else {
-            $optionKeys = $options;
-        }
-
-        $optionList = [];
-        foreach ($optionKeys as $option) {
-            $optionStyles = ['color' => static::CYAN];
-
-            if ($option === $default) {
-                $optionStyles['style'] = static::BOLD;
-            } else {
-                $optionStyles['style'] = static::DIM;
-            }
-
-            $optionList[] = static::style($option, $optionStyles);
-        }
-
-        static::write($prefix.' ('.implode('/', $optionList).')');
-
-        $choice = static::input() ?: $default;
-
-        foreach ($optionKeys as $option) {
-            if (strcasecmp($option, $choice) === 0) {
-                return $option;
-            }
-        }
-
-        return $default;
-    }
-
-    /**
-     * Output comment text.
-     *
-     * @param string $text The text.
-     * @param array $options The style options.
-     */
-    public static function comment(string $text, array $options = [])
-    {
-        $options['style'] ??= static::DIM;
-
-        return static::write($text, $options);
-    }
-
-    /**
-     * Prompt the user to confirm (y/n).
-     *
-     * @param string $text The prompt text.
-     * @param bool $default The default option.
-     * @return bool TRUE if the user confirmed the prompt, otherwise FALSE.
-     */
-    public static function confirm(string $text, bool $default = true): bool
-    {
-        $choice = static::choice($text, ['y', 'n'], $default ? 'y' : 'n');
-
-        return $choice === 'y';
-    }
-
-    /**
-     * Output text to STDERR.
-     *
-     * @param string $text The text.
-     * @param array $options The style options.
-     */
-    public static function error(string $text, array $options = []): void
-    {
-        $options['color'] ??= static::RED;
-
-        $text = static::style($text, $options);
-
-        fwrite(static::$error, $text.PHP_EOL);
-    }
+    protected $output;
 
     /**
      * Get the terminal height (in characters).
@@ -195,101 +93,6 @@ abstract class Console
     public static function getWidth(): int
     {
         return (int) exec('tput cols');
-    }
-
-    /**
-     * Output info text.
-     *
-     * @param string $text The text.
-     * @param array $options The style options.
-     */
-    public static function info(string $text, array $options = [])
-    {
-        $options['color'] ??= static::BLUE;
-
-        return static::write($text, $options);
-    }
-
-    /**
-     * Read a line of input.
-     *
-     * @return string The input text.
-     */
-    public static function input(): string
-    {
-        return rtrim(fgets(static::$input), "\r\n");
-    }
-
-    /**
-     * Output a progress indicator.
-     *
-     * @param int|null $step The step.
-     * @param int $totalSteps The total steps.
-     */
-    public static function progress(int|null $step = null, int $totalSteps = 10): void
-    {
-        if ($step === null) {
-            static::$lastStep = $step;
-
-            fwrite(static::$output, "\033[1A\033[K");
-            fwrite(static::$output, "\007");
-
-            return;
-        }
-
-        if (static::$lastStep && static::$lastStep <= $step) {
-            fwrite(static::$output, "\r\033[1A\r\033[K\r");
-        }
-
-        static::$lastStep = $step;
-
-        $step = max($step, 1);
-        $totalSteps = max($totalSteps, 1);
-
-        $percent = $step / $totalSteps;
-        $step = (int) round($percent * static::TOTAL_STEPS);
-
-        $progressString = str_repeat('#', $step).
-            str_repeat('.', static::TOTAL_STEPS - $step);
-
-        $percentString = static::percentFormatter()->format($percent);
-
-        static::write('['.static::style($progressString, ['color' => static::GREEN]).'] '.$percentString);
-    }
-
-    /**
-     * Prompt the user for input.
-     *
-     * @param string $text The prompt text.
-     * @return string The input text.
-     */
-    public static function prompt(string $text): string
-    {
-        static::write($text, ['color' => static::YELLOW]);
-
-        return static::input();
-    }
-
-    /**
-     * Set the input stream.
-     *
-     * @param mixed $input The input stream.
-     */
-    public static function setInput(mixed $input): void
-    {
-        static::$input = $input;
-    }
-
-    /**
-     * Set the output stream.
-     *
-     * @param mixed $output The output stream.
-     * @param mixed $error The error stream.
-     */
-    public static function setOutput(mixed $output, mixed $error = null)
-    {
-        static::$output = $output;
-        static::$error = $error ?? $output;
     }
 
     /**
@@ -327,16 +130,205 @@ abstract class Console
     }
 
     /**
+     * New Console constructor.
+     *
+     * @param resource $input The input stream.
+     * @param resource $output The output stream.
+     * @param resource $error The error stream.
+     */
+    public function __construct($input = STDIN, $output = STDOUT, $error = STDERR)
+    {
+        $this->input = $input;
+        $this->output = $output;
+        $this->error = $error;
+    }
+
+    /**
+     * Prompt to make a choice out of available options.
+     *
+     * @param string $text The prompt text.
+     * @param array $options The options.
+     * @param string|null $default The default option.
+     * @return string|null The selected option.
+     */
+    public function choice(string $text, array $options, string|null $default = null): string|null
+    {
+        $this->write($text, ['color' => static::YELLOW]);
+
+        $prefix = '';
+        if (!array_is_list($options)) {
+            $optionKeys = array_keys($options);
+
+            $maxLength = 0;
+            foreach ($optionKeys as $option) {
+                $maxLength = max($maxLength, strlen($option));
+            }
+
+            foreach ($options as $option => $description) {
+                $key = str_pad('  ['.$option.']', $maxLength + 6);
+                $key = static::style($key, ['color' => static::CYAN]);
+                $value = static::style($description, ['style' => static::DIM]);
+
+                $this->write($key.$value);
+            }
+
+            $prefix = static::style('Choice', ['color' => static::YELLOW]);
+        } else {
+            $optionKeys = $options;
+        }
+
+        $optionList = [];
+        foreach ($optionKeys as $option) {
+            $optionStyles = ['color' => static::CYAN];
+
+            if ($option === $default) {
+                $optionStyles['style'] = static::BOLD;
+            } else {
+                $optionStyles['style'] = static::DIM;
+            }
+
+            $optionList[] = static::style($option, $optionStyles);
+        }
+
+        $this->write($prefix.' ('.implode('/', $optionList).')');
+
+        $choice = $this->input() ?: $default;
+
+        foreach ($optionKeys as $option) {
+            if (strcasecmp($option, $choice) === 0) {
+                return $option;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * Output comment text.
+     *
+     * @param string $text The text.
+     * @param array $options The style options.
+     */
+    public function comment(string $text, array $options = [])
+    {
+        $options['style'] ??= static::DIM;
+
+        return $this->write($text, $options);
+    }
+
+    /**
+     * Prompt the user to confirm (y/n).
+     *
+     * @param string $text The prompt text.
+     * @param bool $default The default option.
+     * @return bool TRUE if the user confirmed the prompt, otherwise FALSE.
+     */
+    public function confirm(string $text, bool $default = true): bool
+    {
+        $choice = $this->choice($text, ['y', 'n'], $default ? 'y' : 'n');
+
+        return $choice === 'y';
+    }
+
+    /**
+     * Output text to STDERR.
+     *
+     * @param string $text The text.
+     * @param array $options The style options.
+     */
+    public function error(string $text, array $options = []): void
+    {
+        $options['color'] ??= static::RED;
+
+        $text = static::style($text, $options);
+
+        fwrite($this->error, $text.PHP_EOL);
+    }
+
+    /**
+     * Output info text.
+     *
+     * @param string $text The text.
+     * @param array $options The style options.
+     */
+    public function info(string $text, array $options = [])
+    {
+        $options['color'] ??= static::BLUE;
+
+        return $this->write($text, $options);
+    }
+
+    /**
+     * Read a line of input.
+     *
+     * @return string The input text.
+     */
+    public function input(): string
+    {
+        return rtrim(fgets($this->input), "\r\n");
+    }
+
+    /**
+     * Output a progress indicator.
+     *
+     * @param int|null $step The step.
+     * @param int $totalSteps The total steps.
+     */
+    public function progress(int|null $step = null, int $totalSteps = 10): void
+    {
+        if ($step === null) {
+            $this->lastStep = $step;
+
+            fwrite($this->output, "\033[1A\033[K");
+            fwrite($this->output, "\007");
+
+            return;
+        }
+
+        if ($this->lastStep && $this->lastStep <= $step) {
+            fwrite($this->output, "\r\033[1A\r\033[K\r");
+        }
+
+        $this->lastStep = $step;
+
+        $step = max($step, 1);
+        $totalSteps = max($totalSteps, 1);
+
+        $percent = $step / $totalSteps;
+        $step = (int) round($percent * static::TOTAL_STEPS);
+
+        $progressString = str_repeat('#', $step).
+            str_repeat('.', static::TOTAL_STEPS - $step);
+
+        $percentString = static::percentFormatter()->format($percent);
+
+        $this->write('['.static::style($progressString, ['color' => static::GREEN]).'] '.$percentString);
+    }
+
+    /**
+     * Prompt the user for input.
+     *
+     * @param string $text The prompt text.
+     * @return string The input text.
+     */
+    public function prompt(string $text): string
+    {
+        $this->write($text, ['color' => static::YELLOW]);
+
+        return $this->input();
+    }
+
+    /**
      * Output success text.
      *
      * @param string $text The text.
      * @param array $options The style options.
      */
-    public static function success(string $text, array $options = [])
+    public function success(string $text, array $options = [])
     {
         $options['color'] ??= static::GREEN;
 
-        return static::write($text, $options);
+        return $this->write($text, $options);
     }
 
     /**
@@ -345,7 +337,7 @@ abstract class Console
      * @param array $data The table rows.
      * @param array $header The table header columns.
      */
-    public static function table(array $data, array $header = []): void
+    public function table(array $data, array $header = []): void
     {
         if ($header !== []) {
             array_unshift($data, $header);
@@ -389,7 +381,7 @@ abstract class Console
             }
         }
 
-        fwrite(static::$output, $table);
+        fwrite($this->output, $table);
     }
 
     /**
@@ -398,11 +390,11 @@ abstract class Console
      * @param string $text The text.
      * @param array $options The style options.
      */
-    public static function warning(string $text, array $options = [])
+    public function warning(string $text, array $options = [])
     {
         $options['color'] ??= static::YELLOW;
 
-        return static::write($text, $options);
+        return $this->write($text, $options);
     }
 
     /**
@@ -411,7 +403,7 @@ abstract class Console
      * @param string $text The text.
      * @param int|null $maxWidth The maximum width.
      */
-    public static function wrap(string $text, int|null $maxWidth = null): string
+    public function wrap(string $text, int|null $maxWidth = null): string
     {
         $maxWidth = min($maxWidth ?? PHP_INT_MAX, static::getWidth());
 
@@ -424,11 +416,11 @@ abstract class Console
      * @param string $text The text.
      * @param array $options The style options.
      */
-    public static function write(string $text, array $options = []): void
+    public function write(string $text, array $options = []): void
     {
         $text = static::style($text, $options);
 
-        fwrite(static::$output, $text.PHP_EOL);
+        fwrite($this->output, $text.PHP_EOL);
     }
 
     /**
