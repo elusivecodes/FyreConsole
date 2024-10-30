@@ -176,17 +176,6 @@ Output warning text.
 $io->warning($text, $options);
 ```
 
-**Wrap**
-
-Wrap text for terminal output.
-
-- `$text` is a string representing the text.
-- `$maxWidth` is a number representing the maximum character width of a line, and will default to the terminal width.
-
-```php
-$wrap = $io->wrap($text, $maxWidth);
-```
-
 **Write**
 
 Output text to *STDOUT*.
@@ -232,6 +221,17 @@ Style text for terminal output.
 
 ```php
 $style = Console::style($text, $options);
+```
+
+**Wrap**
+
+Wrap text for terminal output.
+
+- `$text` is a string representing the text.
+- `$maxWidth` is a number representing the maximum character width of a line, and will default to the terminal width.
+
+```php
+$wrap = Console::wrap($text, $maxWidth);
 ```
 
 

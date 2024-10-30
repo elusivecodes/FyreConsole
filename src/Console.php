@@ -130,6 +130,19 @@ class Console
     }
 
     /**
+     * Wrap text for terminal output.
+     *
+     * @param string $text The text.
+     * @param int|null $maxWidth The maximum width.
+     */
+    public static function wrap(string $text, int|null $maxWidth = null): string
+    {
+        $maxWidth = min($maxWidth ?? PHP_INT_MAX, static::getWidth());
+
+        return wordwrap($text, $maxWidth, PHP_EOL);
+    }
+
+    /**
      * New Console constructor.
      *
      * @param resource $input The input stream.
@@ -395,19 +408,6 @@ class Console
         $options['color'] ??= static::YELLOW;
 
         return $this->write($text, $options);
-    }
-
-    /**
-     * Wrap text for terminal output.
-     *
-     * @param string $text The text.
-     * @param int|null $maxWidth The maximum width.
-     */
-    public function wrap(string $text, int|null $maxWidth = null): string
-    {
-        $maxWidth = min($maxWidth ?? PHP_INT_MAX, static::getWidth());
-
-        return wordwrap($text, $maxWidth, PHP_EOL);
     }
 
     /**

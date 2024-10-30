@@ -359,7 +359,7 @@ final class ConsoleTest extends TestCase
             'is a'.PHP_EOL.
             'test'.PHP_EOL.
             'string',
-            $this->console->wrap('This is a test string', 5)
+            Console::wrap('This is a test string', 5)
         );
     }
 
