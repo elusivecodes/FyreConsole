@@ -11,6 +11,7 @@ use function array_unshift;
 use function count;
 use function exec;
 use function fgets;
+use function fopen;
 use function fwrite;
 use function implode;
 use function max;
@@ -25,7 +26,9 @@ use function wordwrap;
 
 use const PHP_EOL;
 use const PHP_INT_MAX;
+use const PHP_SAPI;
 use const STDERR;
+use const STDIN;
 use const STDOUT;
 
 /**
@@ -149,11 +152,20 @@ class Console
      * @param resource $output The output stream.
      * @param resource $error The error stream.
      */
-    public function __construct($input = STDIN, $output = STDOUT, $error = STDERR)
+    public function __construct($input = null, $output = null, $error = null)
     {
         $this->input = $input;
         $this->output = $output;
         $this->error = $error;
+
+        if (PHP_SAPI === 'cli') {
+            $this->input ??= STDIN;
+            $this->output ??= STDOUT;
+            $this->error ??= STDERR;
+        } else {
+            $this->output ??= fopen('php://output', 'w');
+            $this->error ??= $this->output;
+        }
     }
 
     /**
@@ -278,6 +290,10 @@ class Console
      */
     public function input(): string
     {
+        if (!$this->input) {
+            return '';
+        }
+
         return rtrim(fgets($this->input), "\r\n");
     }
 
