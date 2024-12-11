@@ -30,9 +30,9 @@ use Fyre\Console\Console;
 
 ## Basic Usage
 
-- `$input` is the input stream, and will default to `STDIN`.
-- `$output` is the output stream, and will default to `STDOUT`.
-- `$error` is the error stream, and will default to `STDERR`.
+- `$input` is the input stream, and will default to `STDIN` (or `null` for non-CLI usage).
+- `$output` is the output stream, and will default to `STDOUT` (or "*php://output*" for non-CLI usage).
+- `$error` is the error stream, and will default to `STDERR` (or "*php://output*" for non-CLI usage).
 
 ```php
 $io = new Console($input, $output, $error);
