@@ -70,13 +70,7 @@ class Console
 
     protected static NumberFormatter $percentFormatter;
 
-    protected $error;
-
-    protected $input;
-
     protected int|null $lastStep = null;
-
-    protected $output;
 
     /**
      * Get the terminal height (in characters).
@@ -152,12 +146,11 @@ class Console
      * @param resource $output The output stream.
      * @param resource $error The error stream.
      */
-    public function __construct($input = null, $output = null, $error = null)
-    {
-        $this->input = $input;
-        $this->output = $output;
-        $this->error = $error;
-
+    public function __construct(
+        protected $input = null,
+        protected $output = null,
+        protected $error = null
+    ) {
         if (PHP_SAPI === 'cli') {
             $this->input ??= STDIN;
             $this->output ??= STDOUT;
